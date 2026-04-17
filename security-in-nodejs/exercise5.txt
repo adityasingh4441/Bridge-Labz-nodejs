@@ -1,0 +1,56 @@
+Banking System (QuickBank)
+
+
+Critical Vulnerabilities
+	•	Amount manipulation
+	•	MongoDB injection
+	•	No rate limiting
+	•	Weak session handling
+	•	Token reuse
+
+
+
+
+Transaction Security
+if (amount <= 0 || amount > 100000) {
+  return res.status(400).send('Invalid amount');
+}
+
+
+
+2FA for Transactions
+if (amount > 1000) {
+  verifyOTP(req.body.otp);
+}
+
+
+Injection Protection
+if (typeof accountNumber !== 'string') throw Error();
+
+
+
+Secure Password Reset
+tokenExpiry = Date.now() + 15 * 60 * 1000;
+
+
+Rate Limiting
+app.use('/transfer', rateLimit({ max: 3 }));
+
+
+
+
+Secure Sessions
+cookie: {
+  httpOnly: true,
+  secure: true,
+  sameSite: 'strict'
+}
+
+
+
+Logging
+logger.info({
+  user: req.user.id,
+  action: 'transfer',
+  amount
+});

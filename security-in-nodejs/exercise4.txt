@@ -1,0 +1,37 @@
+ Healthcare System (MediBook)
+
+
+Vulnerabilities
+	•	Accessing other patients’ data (IDOR)
+	•	No input validation (dates, email)
+	•	XSS in doctor notes
+	•	Sessions never expire
+	•	Unsafe file uploads
+
+
+Role-Based Access
+if (req.user.role !== 'doctor' && req.user.id !== patientId) {
+  return res.status(403).send('Forbidden');
+}
+
+
+
+ Input Validation
+if (!validator.isEmail(email)) throw Error();
+if (!validator.isISO8601(date)) throw Error();
+
+
+ Secure Upload
+ if (file.size > 5MB) return res.send('Too large');
+
+
+ Session Timeout
+ maxAge: 15 * 60 * 1000 // 15 min
+
+
+ Audit Logs
+ console.log({
+  user: req.user.id,
+  action: 'view_record',
+  time: new Date()
+});
