@@ -1,0 +1,31 @@
+Online Learning Platform 
+
+
+
+Vulnerabilities
+	•	Broken authorization (course leakage)
+	•	XSS in course descriptions
+	•	File upload risk
+	•	No rate limiting
+	•	Sessions lost (in-memory)
+
+
+Role-Based Access
+if (req.user.role !== 'instructor') {
+  return res.status(403).send('Access denied');
+}
+
+
+
+Course Description Sanitization
+content = DOMPurify.sanitize(content, {
+  ALLOWED_TAGS: ['p','b','i','ul','li']
+});
+
+
+
+
+File Upload Security
+if (!['image/png','application/pdf'].includes(file.mimetype)) {
+  return res.status(400).send('Invalid file');
+}

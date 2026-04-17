@@ -1,0 +1,65 @@
+E-Commerce Platform Security Audit
+
+
+1. Vulnerabilities
+	•	MongoDB Injection in product search (price, category)
+	•	Broken authentication (admin access without checks)
+	•	XSS in reviews (scripts in comments)
+	•	Session issues (stored in memory → not scalable)
+	•	No rate limiting → brute force possible
+
+
+    2. Secure Authentication (MongoStore)
+    app.use(session({
+  secret: process.env.SESSION_SECRET,
+  store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'strict'
+  }
+}));
+
+
+3. MongoDB Injection Fix (Search)
+app.get('/products', async (req, res) => {
+  let { category, price } = req.query;
+
+  if (typeof category !== 'string') return res.status(400).send();
+  price = parseInt(price);
+
+  const products = await Product.find({
+    category,
+    price: price
+  });
+
+  res.json(products);
+});
+
+
+
+4. XSS Protection (Reviews)
+const DOMPurify = require('dompurify')(new JSDOM('').window);
+
+review = DOMPurify.sanitize(review, {
+  ALLOWED_TAGS: ['b','i','strong']
+});
+
+
+
+ 5. Helmet Config
+ app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      scriptSrc: ["'self'", "https://js.stripe.com"],
+      frameSrc: ["https://www.youtube.com"]
+    }
+  }
+}));
+
+
+6. Rate Limiting
+const limiter = rateLimit({ max: 5, windowMs: 15 * 60 * 1000 });
+app.use('/login', limiter);
